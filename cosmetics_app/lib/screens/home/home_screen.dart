@@ -4,7 +4,8 @@ import '../../services/database_service.dart';
 import '../../models/product_model.dart';
 import '../auth/login_screen.dart';
 import 'product_card.dart';
-import '../cart/cart_screen.dart'; // <--- 1. IMPORT THIS
+import '../cart/cart_screen.dart'; 
+import '../orders/orders_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -42,7 +43,15 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          
+          IconButton(
+  icon: const Icon(Icons.receipt_long, color: Colors.black), // Receipt icon
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const OrdersScreen()),
+    );
+  },
+),
           // LOGOUT BUTTON
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.black),

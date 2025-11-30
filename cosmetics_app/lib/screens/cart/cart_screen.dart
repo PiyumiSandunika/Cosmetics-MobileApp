@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/cart_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/database_service.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -69,12 +71,45 @@ class CartScreen extends StatelessWidget {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                           ),
                           child: const Text("CHECKOUT NOW", style: TextStyle(fontSize: 18, color: Colors.white)),
-                          onPressed: () {
-                            // We will do Payment integration later
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Proceeding to payment...")),
-                            );
-                          },
+                          onPressed: () async {
+  // 1. Get the current user
+  final user = FirebaseAuth.instance.currentUser;
+  
+  if (user == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Please login to checkout")),
+    );
+    return;
+  }
+
+  // 2. Prepare the items list for database
+  // We only save the name and price to keep it simple
+  final orderItems = cart.items.map((item) => {
+    'name': item.name,
+    'price': item.price,
+    'imageUrl': item.imageUrl,
+  }).toList();
+
+  // 3. Save to Firebase
+  await DatabaseService().placeOrder(
+    user.uid, 
+    cart.totalPrice, 
+    orderItems
+  );
+
+  // 4. Clear the local cart
+  cart.clearCart();
+
+  // 5. Show success and maybe go to Orders screen
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("Order Placed Successfully!"),
+      backgroundColor: Colors.green,
+    ),
+  );
+  
+  // Optional: Navigator.pop(context); // Go back to home
+},
                         ),
                       )
                     ],

@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/product_model.dart';
+import '../models/order_model.dart'; 
 
 class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // 1. GET ALL PRODUCTS (Real-time)
+  // 1. GET ALL PRODUCTS
   Stream<List<Product>> getProducts() {
     return _db.collection('products').snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -13,11 +14,9 @@ class DatabaseService {
     });
   }
 
-  // 2. HELPER: Add Sample Data (Run this once to fill your database)
+  // 2. HELPER: Add Sample Data
   Future<void> addDummyData() async {
     final CollectionReference products = _db.collection('products');
-    
-    // Safety check: Don't add if data already exists
     var snapshot = await products.limit(1).get();
     if (snapshot.docs.isNotEmpty) return;
 
@@ -31,21 +30,21 @@ class DatabaseService {
       },
       {
         "name": "Hydrating Face Serum",
-        "description": "Infused with Vitamin C and Hyaluronic Acid for a natural glow.",
+        "description": "Infused with Vitamin C and Hyaluronic Acid.",
         "price": 45.50,
         "category": "Skincare",
         "imageUrl": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=400&q=80"
       },
       {
         "name": "Rose Gold Palette",
-        "description": "12 shimmer and matte shades perfect for day and night.",
+        "description": "12 shimmer and matte shades.",
         "price": 32.00,
         "category": "Makeup",
         "imageUrl": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=400&q=80"
       },
       {
         "name": "Daily Moisturizer",
-        "description": "Lightweight, non-greasy formula suitable for all skin types.",
+        "description": "Lightweight, non-greasy formula.",
         "price": 18.99,
         "category": "Skincare",
         "imageUrl": "https://images.unsplash.com/photo-1608248597279-f99d160bfbc8?auto=format&fit=crop&w=400&q=80"
@@ -55,5 +54,30 @@ class DatabaseService {
     for (var p in dummyProducts) {
       await products.add(p);
     }
+  }
+
+  // 3. PLACE ORDER 
+  Future<void> placeOrder(String userId, double total, List<dynamic> items) async {
+    await _db.collection('orders').add({
+      'userId': userId,
+      'total': total,
+      'status': 'Pending',
+      'date': Timestamp.now(),
+      'items': items,
+    });
+  }
+
+  // 4. GET MY ORDERS
+  Stream<List<OrderModel>> getUserOrders(String userId) {
+    return _db
+        .collection('orders')
+        .where('userId', isEqualTo: userId)
+        .orderBy('date', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return OrderModel.fromMap(doc.data(), doc.id);
+      }).toList();
+    });
   }
 }
