@@ -4,6 +4,7 @@ import '../../services/database_service.dart';
 import '../../models/product_model.dart';
 import '../auth/login_screen.dart';
 import 'product_card.dart';
+import '../cart/cart_screen.dart'; // <--- 1. IMPORT THIS
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,11 +17,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final auth = AuthService();
   final dbService = DatabaseService();
 
-  // STATE VARIABLES (To remember what user selected)
+  // STATE VARIABLES
   String searchQuery = "";
   String selectedCategory = "All";
   
-  // List of categories for the filter buttons
   final List<String> categories = ["All", "Makeup", "Skincare", "Perfume"];
 
   @override
@@ -32,8 +32,20 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
+          // <--- 2. ADDED CART BUTTON HERE
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.shopping_cart, color: Colors.black),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CartScreen()),
+              );
+            },
+          ),
+          
+          // LOGOUT BUTTON
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.black),
             onPressed: () async {
               await auth.logout();
               Navigator.pushReplacement(
@@ -51,7 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
             // 1. SEARCH BAR
             TextField(
               onChanged: (value) {
-                // Update the state whenever user types
                 setState(() {
                   searchQuery = value.toLowerCase();
                 });
@@ -70,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 16),
 
-            // 2. CATEGORY FILTER (Horizontal Scroll)
+            // 2. CATEGORY FILTER
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -87,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       selected: isSelected,
-                      selectedColor: Theme.of(context).primaryColor, // Pink
+                      selectedColor: Theme.of(context).primaryColor,
                       backgroundColor: Colors.grey.shade100,
                       onSelected: (bool selected) {
                         setState(() {
@@ -102,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 16),
 
-            // 3. PRODUCT GRID (With Filter Logic)
+            // 3. PRODUCT GRID
             Expanded(
               child: StreamBuilder<List<Product>>(
                 stream: dbService.getProducts(),
@@ -116,14 +127,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   final allProducts = snapshot.data!;
 
-                  // --- FILTER LOGIC STARTS HERE ---
+                  // FILTER LOGIC
                   final filteredProducts = allProducts.where((product) {
                     final matchesSearch = product.name.toLowerCase().contains(searchQuery);
                     final matchesCategory = selectedCategory == "All" || product.category == selectedCategory;
                     
                     return matchesSearch && matchesCategory;
                   }).toList();
-                  // --- FILTER LOGIC ENDS HERE ---
 
                   if (filteredProducts.isEmpty) {
                     return const Center(

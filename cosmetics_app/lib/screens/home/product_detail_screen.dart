@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/product_model.dart';
+import 'package:provider/provider.dart';
+import '../../providers/cart_provider.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
@@ -93,22 +95,30 @@ class ProductDetailScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                        backgroundColor: Theme.of(context).primaryColor,
-                      ),
-                      child: const Text(
-                        "ADD TO CART",
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
-                      onPressed: () {
-                        // TODO: Implement Cart Logic later
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Added to cart!")),
-                        );
-                      },
+                      
+                     style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      backgroundColor: Theme.of(context).primaryColor,
                     ),
+                    child: const Text(
+                      "ADD TO CART",
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                    onPressed: () {
+                    // 1. Add to global cart state
+                      context.read<CartProvider>().addToCart(product);
+
+                    // 2. Show success message
+                     ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("${product.name} added to cart!"),
+                        duration: const Duration(seconds: 1),
+                         backgroundColor: Colors.green,
+                        ),
+                         );
+                    },
+                  ),
                   ),
                 ],
               ),
