@@ -4,8 +4,9 @@ import '../../services/database_service.dart';
 import '../../models/product_model.dart';
 import '../auth/login_screen.dart';
 import 'product_card.dart';
-import '../cart/cart_screen.dart'; 
+import '../cart/cart_screen.dart';
 import '../orders/orders_screen.dart';
+import '../wishlist/wishlist_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // STATE VARIABLES
   String searchQuery = "";
   String selectedCategory = "All";
-  
+
   final List<String> categories = ["All", "Makeup", "Skincare", "Perfume"];
 
   @override
@@ -44,14 +45,26 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           IconButton(
-  icon: const Icon(Icons.receipt_long, color: Colors.black), // Receipt icon
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const OrdersScreen()),
-    );
-  },
-),
+            icon: const Icon(
+              Icons.receipt_long,
+              color: Colors.black,
+            ), // Receipt icon
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const OrdersScreen()),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.favorite, color: Colors.red),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const WishlistScreen()),
+              );
+            },
+          ),
           // LOGOUT BUTTON
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.black),
@@ -62,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(builder: (_) => const LoginScreen()),
               );
             },
-          )
+          ),
         ],
       ),
       body: Padding(
@@ -103,7 +116,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         category,
                         style: TextStyle(
                           color: isSelected ? Colors.white : Colors.black,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
                       ),
                       selected: isSelected,
@@ -138,9 +153,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   // FILTER LOGIC
                   final filteredProducts = allProducts.where((product) {
-                    final matchesSearch = product.name.toLowerCase().contains(searchQuery);
-                    final matchesCategory = selectedCategory == "All" || product.category == selectedCategory;
-                    
+                    final matchesSearch = product.name.toLowerCase().contains(
+                      searchQuery,
+                    );
+                    final matchesCategory =
+                        selectedCategory == "All" ||
+                        product.category == selectedCategory;
+
                     return matchesSearch && matchesCategory;
                   }).toList();
 
@@ -151,12 +170,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
 
                   return GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.75,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.75,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
                     itemCount: filteredProducts.length,
                     itemBuilder: (context, index) {
                       return ProductCard(product: filteredProducts[index]);
