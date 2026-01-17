@@ -94,7 +94,7 @@ class OrdersScreen extends StatelessWidget {
                                 style: TextStyle(color: Colors.grey[600]),
                               ),
                               Expanded(child: Text(item['name'])),
-                              Text("\$${item['price']}"),
+                              Text("Rs.${item['price']}"),
                             ],
                           ),
                         ),
@@ -108,7 +108,7 @@ class OrdersScreen extends StatelessWidget {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "\$${order.total.toStringAsFixed(2)}",
+                            "Rs.${order.total.toStringAsFixed(2)}",
                             style: TextStyle(
                               color: Theme.of(context).primaryColor,
                               fontWeight: FontWeight.bold,

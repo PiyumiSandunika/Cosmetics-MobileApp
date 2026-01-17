@@ -161,7 +161,7 @@ class ProductDetailScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "\$${product.price.toStringAsFixed(2)}",
+                        "Rs.${product.price.toStringAsFixed(2)}",
                         style: TextStyle(
                           fontSize: 22,
                           color: Theme.of(context).primaryColor,

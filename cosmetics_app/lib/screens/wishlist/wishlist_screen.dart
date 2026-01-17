@@ -68,7 +68,7 @@ class WishlistScreen extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    "\$${product.price.toStringAsFixed(2)}",
+                    "Rs.${product.price.toStringAsFixed(2)}",
                     style: TextStyle(color: Theme.of(context).primaryColor),
                   ),
                   trailing: IconButton(

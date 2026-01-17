@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:provider/provider.dart'; // Import Provider
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+
+// Imports for your screens and services
 import 'screens/auth/login_screen.dart';
-import 'providers/cart_provider.dart'; // Import your new CartProvider
+import 'screens/home/home_screen.dart';
+import 'providers/cart_provider.dart';
+import 'services/database_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,8 +16,17 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // --- UPLOAD SECTION ---
+  print("ATTEMPTING TO UPLOAD PRODUCTS..."); // Look for this in console
+  try {
+    await DatabaseService().addDummyData();
+    print("UPLOAD FUNCTION FINISHED"); // Look for this in console
+  } catch (e) {
+    print("UPLOAD FAILED: $e");
+  }
+  // ----------------------
+
   runApp(
-    // Wrap the app with ChangeNotifierProvider
     ChangeNotifierProvider(
       create: (context) => CartProvider(),
       child: const MyApp(),
@@ -28,13 +42,23 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Glow Cosmetics',
-      // ... (Rest of your theme code remains the same)
       themeMode: ThemeMode.light,
       theme: ThemeData(
+        primarySwatch: Colors.pink,
         primaryColor: const Color(0xFFE91E63),
-        // ... keep your existing theme settings here
+        scaffoldBackgroundColor: Colors.grey[50],
+        useMaterial3: true,
       ),
-      home: const LoginScreen(),
+      // Check if user is logged in
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return const HomeScreen();
+          }
+          return const LoginScreen();
+        },
+      ),
     );
   }
 }

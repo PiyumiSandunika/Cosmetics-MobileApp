@@ -32,7 +32,7 @@ class CartScreen extends StatelessWidget {
                       return ListTile(
                         leading: Image.network(product.imageUrl, width: 50, height: 50, fit: BoxFit.cover),
                         title: Text(product.name),
-                        subtitle: Text("\$${product.price.toStringAsFixed(2)}"),
+                        subtitle: Text("Rs.${product.price.toStringAsFixed(2)}"),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () {
@@ -57,7 +57,7 @@ class CartScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text("Total:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                          Text("\$${cart.totalPrice.toStringAsFixed(2)}", 
+                          Text("Rs.${cart.totalPrice.toStringAsFixed(2)}", 
                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.pink)),
                         ],
                       ),
