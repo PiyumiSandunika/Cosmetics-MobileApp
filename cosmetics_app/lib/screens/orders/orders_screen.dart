@@ -12,10 +12,11 @@ class OrdersScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
     final dbService = DatabaseService();
 
-    if (user == null) return const Scaffold(body: Center(child: Text("Please Login")));
+    if (user == null)
+      return const Scaffold(body: Center(child: Text("Please Login")));
 
     return Scaffold(
-      appBar: AppBar(title: const Text("My Orders")),
+      appBar: AppBar(title: const Text("Track My Orders"), centerTitle: true),
       body: StreamBuilder<List<OrderModel>>(
         stream: dbService.getUserOrders(user.uid),
         builder: (context, snapshot) {
@@ -23,8 +24,17 @@ class OrdersScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No past orders found."));
-          }
+  return Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.local_shipping_outlined, size: 60, color: Colors.grey),
+        const SizedBox(height: 10),
+        const Text("You haven't placed any orders yet!"),
+      ],
+    ),
+  );
+}
 
           final orders = snapshot.data!;
 
@@ -35,7 +45,9 @@ class OrdersScreen extends StatelessWidget {
               final order = orders[index];
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -45,19 +57,26 @@ class OrdersScreen extends StatelessWidget {
                         children: [
                           Text(
                             // Requires intl package, or just use order.date.toString()
-                            DateFormat('MMM dd, yyyy').format(order.date), 
+                            DateFormat('MMM dd, yyyy').format(order.date),
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color: order.status == 'Pending' ? Colors.orange.shade100 : Colors.green.shade100,
+                              color: order.status == 'Pending'
+                                  ? Colors.amber.shade200
+                                  : Colors.blue.shade100,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
                               order.status,
                               style: TextStyle(
-                                color: order.status == 'Pending' ? Colors.orange.shade800 : Colors.green.shade800,
+                                color: order.status == 'Pending'
+                                    ? Colors.orange.shade800
+                                    : Colors.green.shade800,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -65,21 +84,29 @@ class OrdersScreen extends StatelessWidget {
                         ],
                       ),
                       const Divider(),
-                      ...order.items.map((item) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2.0),
-                        child: Row(
-                          children: [
-                            Text("1x ", style: TextStyle(color: Colors.grey[600])),
-                            Expanded(child: Text(item['name'])),
-                            Text("\$${item['price']}"),
-                          ],
+                      ...order.items.map(
+                        (item) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                "1x ",
+                                style: TextStyle(color: Colors.grey[600]),
+                              ),
+                              Expanded(child: Text(item['name'])),
+                              Text("\$${item['price']}"),
+                            ],
+                          ),
                         ),
-                      )),
+                      ),
                       const Divider(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("Total Paid", style: TextStyle(fontWeight: FontWeight.bold)),
+                          const Text(
+                            "Total Paid",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           Text(
                             "\$${order.total.toStringAsFixed(2)}",
                             style: TextStyle(
@@ -89,7 +116,7 @@ class OrdersScreen extends StatelessWidget {
                             ),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
