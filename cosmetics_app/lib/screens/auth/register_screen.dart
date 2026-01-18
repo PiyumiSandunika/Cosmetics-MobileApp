@@ -6,7 +6,7 @@ class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
@@ -17,9 +17,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Theme colors same as login screen
+    // Theme colors
     final Color lightBackground = const Color(0xFFFFF0F5);
-    final Color lightPink = const Color(0xFFFFC1E3);
     final Color darkPink = const Color(0xFFFF82AB);
 
     return Scaffold(
@@ -30,15 +29,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo/Icon
+              // --- 🖼️ LOCAL LOGO START ---
               Container(
-                decoration: BoxDecoration(
-                  color: lightPink.withOpacity(0.4),
-                  shape: BoxShape.circle,
+                padding: const EdgeInsets.all(10),
+                child: Image.asset(
+                  'assets/images/logo.png', // <--- Ensure matches your file (logo.jpg or logo.png)
+                  height: 150,
+                  width: 150,
+                  fit: BoxFit.contain,
                 ),
-                padding: const EdgeInsets.all(20),
-                child: Icon(Icons.brush, size: 80, color: darkPink),
               ),
+              // --- 🖼️ LOCAL LOGO END ---
+
               const SizedBox(height: 12),
               const Text(
                 "JOIN GLOW COSMETICS",
@@ -129,28 +131,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             passCtrl.text.trim(),
                           );
 
+                          if (!mounted) return;
+
                           setState(() => isLoading = false);
 
                           if (user != null) {
+                            // --- ✅ YOUR UPDATED SNACKBAR CODE ---
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: const Text(
+                                content: Text( // Removed 'const' here to allow dynamic styling if needed, but 'const' is fine if style is static
                                   "Account created! Please login.",
                                   style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[700], // <--- GREY TEXT
                                     fontSize: 16,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 backgroundColor: darkPink,
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
+                                behavior: SnackBarBehavior.floating, // Added floating for better look
                                 margin: const EdgeInsets.all(16),
-                                duration: const Duration(seconds: 3),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               ),
                             );
+                            // -------------------------------------
 
                             Navigator.pushReplacement(
                               context,
@@ -158,7 +161,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   builder: (_) => const LoginScreen()),
                             );
                           } else {
-                            // Optional: show error SnackBar
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: const Text(
@@ -166,16 +168,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 16,
                                   ),
                                 ),
-                                backgroundColor:  const Color.fromARGB(255, 109, 9, 42),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                margin: const EdgeInsets.all(16),
-                                duration: const Duration(seconds: 3),
+                                backgroundColor:
+                                    const Color.fromARGB(255, 109, 9, 42),
                               ),
                             );
                           }
@@ -190,7 +186,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: [
                   const Text(
                     "Already have an account?",
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                    style: TextStyle(color: Color.fromARGB(255, 99, 99, 99), fontSize: 16),
                   ),
                   TextButton(
                     child: Text(
@@ -198,11 +194,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       style: TextStyle(
                         color: const Color.fromARGB(255, 156, 61, 89),
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 18,
                       ),
                     ),
                     onPressed: () {
-                      Navigator.pop(context); // go back to login
+                      Navigator.pop(context);
                     },
                   ),
                 ],
