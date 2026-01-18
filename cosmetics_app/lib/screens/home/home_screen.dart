@@ -152,18 +152,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           label: Text(
                             category,
                             style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black87,
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                              color: isSelected ? Color.fromARGB(255, 241, 240, 240) : Colors.black87,
+                              
+                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.normal,
                             ),
                           ),
                           selected: isSelected,
                           selectedColor: primaryColor,
-                          backgroundColor: Colors.grey.shade50,
+                          backgroundColor: const Color.fromARGB(255, 241, 240, 240),
                           // Modern minimal border
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                             side: BorderSide(
-                              color: isSelected ? primaryColor : Colors.grey.shade200,
+                              color: isSelected ? primaryColor : const Color.fromARGB(255, 197, 196, 196),
                             ),
                           ),
                           onSelected: (bool selected) {
