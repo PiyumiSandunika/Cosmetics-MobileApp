@@ -23,7 +23,7 @@ class ProductDetailScreen extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text("Write a Review"),
+              title: const Text("Write a Review", style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,),),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -104,35 +104,69 @@ class ProductDetailScreen extends StatelessWidget {
     final dbService = DatabaseService();
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
+    extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black87),
+        // REPLACE THE ENTIRE actions: [] BLOCK WITH THIS:
         actions: [
-          IconButton(
-            icon: const Icon(Icons.favorite_border, color: Colors.red),
-            onPressed: () async {
-              final user = FirebaseAuth.instance.currentUser;
-              if (user != null) {
-                await DatabaseService().addToWishlist(user.uid, product);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Added to Wishlist!"),
-                    backgroundColor: Colors.pink,
-                  ),
-                );
+          StreamBuilder<List<Product>>(
+            stream: dbService.getWishlist(FirebaseAuth.instance.currentUser?.uid ?? ""),
+            builder: (context, snapshot) {
+              // Check if THIS product is currently in the wishlist data
+              bool isInWishlist = false;
+              if (snapshot.hasData) {
+                isInWishlist = snapshot.data!.any((p) => p.id == product.id);
               }
+
+              return IconButton(
+                // Toggle icon: Filled if true, Border if false
+                icon: Icon(isInWishlist ? Icons.favorite : Icons.favorite_border),
+                // Toggle color: Red if true, Pink if false
+                color: isInWishlist ? const Color.fromARGB(255, 194, 29, 18) : const Color(0xFFFF82AB),
+                onPressed: () async {
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (user != null) {
+                    if (isInWishlist) {
+                      // Remove it
+                      await dbService.removeFromWishlist(user.uid, product.id);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text("Removed from Wishlist", style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white,),),
+                            backgroundColor: const Color.fromARGB(255, 145, 36, 72),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            margin: const EdgeInsets.all(16),
+                          ),
+                      );
+                    } else {
+                      // Add it
+                      await dbService.addToWishlist(user.uid, product);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text("Added to Wishlist!", style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white,),),
+                          backgroundColor: const Color.fromARGB(255, 145, 36, 72),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          margin: const EdgeInsets.all(16),
+                        ),
+                      );
+                    }
+                  }
+                },
+              );
             },
           ),
         ],
       ),
+
       body: SingleChildScrollView(
         child: Column(
           children: [
             // 1. IMAGE
             SizedBox(
-              height: 300,
+              height: 350,
               width: double.infinity,
               child: Image.network(product.imageUrl, fit: BoxFit.cover),
             ),
@@ -161,9 +195,9 @@ class ProductDetailScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "\$${product.price.toStringAsFixed(2)}",
+                        "Rs. ${product.price.toStringAsFixed(2)}",
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 20,
                           color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.bold,
                         ),
@@ -191,17 +225,36 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                       child: const Text(
                         "ADD TO CART",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       onPressed: () {
                         context.read<CartProvider>().addToCart(product);
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text("${product.name} added to cart!"),
-                            backgroundColor: Colors.green,
+                            content: Text(
+                              "${product.name} added to cart!",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            backgroundColor: const Color.fromARGB(255, 32, 170, 165),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            margin: const EdgeInsets.all(16),
+                            duration: const Duration(seconds: 2),
                           ),
                         );
                       },
+
                     ),
                   ),
 
@@ -234,37 +287,73 @@ class ProductDetailScreen extends StatelessWidget {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }
+                      
+                      // <--- CHANGE 1: If empty, SHOW THE TEXT AGAIN
                       if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Text(
-                          "No reviews yet. Be the first!",
-                          style: TextStyle(color: Colors.grey),
+                        return const Padding(
+                          padding: EdgeInsets.only(top: 10.0),
+                          child: Text(
+                            "No reviews yet. Be the first!",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 137, 134, 134),
+                            ),
+                          ),
                         );
                       }
 
                       return ListView.builder(
-                        shrinkWrap: true, // Important for nested list
-                        physics:
-                            const NeverScrollableScrollPhysics(), // Disable internal scroll
+                        shrinkWrap: true, 
+                        padding: EdgeInsets.zero,
+                        physics: const NeverScrollableScrollPhysics(), 
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
                           final review = snapshot.data![index];
-                          return ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: const CircleAvatar(
-                              child: Icon(Icons.person),
+                          
+                          // <--- CHANGE 2: Added Container with Color
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 10), // Spacing between reviews
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 243, 197, 215),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: const Color.fromARGB(255, 237, 139, 173)),
                             ),
-                            title: Text(review.userName),
-                            subtitle: Text(review.comment),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
-                                  size: 16,
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: CircleAvatar(
+                                backgroundColor: const Color.fromARGB(255, 243, 96, 154),
+                                child: Icon(Icons.person, color: Colors.grey.shade400),
+                              ),
+                              title: Text(
+                                review.userName,
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 4.0),
+                                child: Text(review.comment),
+                              ),
+                              trailing: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                Text(review.rating.toString()),
-                              ],
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.star_rounded,
+                                      color: Colors.amber,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      review.rating.toString(),
+                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           );
                         },
