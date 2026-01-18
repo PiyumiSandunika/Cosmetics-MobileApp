@@ -15,10 +15,17 @@ class WishlistScreen extends StatelessWidget {
     if (user == null)
       return const Scaffold(body: Center(child: Text("Please Login")));
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("My Wishlist")),
+        return Scaffold(
+          appBar: AppBar(
+          centerTitle: true,
+          title: const Text(
+        "My Wishlist",
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black,),),
+        ),
+
       body: StreamBuilder<List<Product>>(
         stream: dbService.getWishlist(user.uid),
+
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

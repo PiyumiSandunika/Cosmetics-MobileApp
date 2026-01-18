@@ -14,7 +14,8 @@ class CartScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My Shopping Cart", style: TextStyle(color: Colors.black)),
+        centerTitle: true,
+        title: const Text("My Shopping Cart", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20,)),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
@@ -72,44 +73,57 @@ class CartScreen extends StatelessWidget {
                           ),
                           child: const Text("CHECKOUT NOW", style: TextStyle(fontSize: 18, color: Colors.white)),
                           onPressed: () async {
-  // 1. Get the current user
-  final user = FirebaseAuth.instance.currentUser;
-  
-  if (user == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Please login to checkout")),
-    );
-    return;
-  }
+                            // 1. Get the current user
+                            final user = FirebaseAuth.instance.currentUser;
+                            
+                            if (user == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Please login to checkout")),
+                              );
+                              return;
+                            }
 
-  // 2. Prepare the items list for database
-  // We only save the name and price to keep it simple
-  final orderItems = cart.items.map((item) => {
-    'name': item.name,
-    'price': item.price,
-    'imageUrl': item.imageUrl,
-  }).toList();
+                            // 2. Prepare the items list for database
+                            // We only save the name and price to keep it simple
+                            final orderItems = cart.items.map((item) => {
+                              'name': item.name,
+                              'price': item.price,
+                              'imageUrl': item.imageUrl,
+                            }).toList();
 
-  // 3. Save to Firebase
-  await DatabaseService().placeOrder(
-    user.uid, 
-    cart.totalPrice, 
-    orderItems
-  );
+                            // 3. Save to Firebase
+                            await DatabaseService().placeOrder(
+                              user.uid, 
+                              cart.totalPrice, 
+                              orderItems
+                            );
 
-  // 4. Clear the local cart
-  cart.clearCart();
+                            // 4. Clear the local cart
+                            cart.clearCart();
 
-  // 5. Show success and maybe go to Orders screen
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text("Order Placed Successfully!"),
-      backgroundColor: Colors.green,
-    ),
-  );
-  
-  // Optional: Navigator.pop(context); // Go back to home
-},
+                            // 5. Show success and maybe go to Orders screen
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text(
+                                  "Order Placed Successfully!",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                backgroundColor: const Color.fromARGB(255, 32, 170, 165),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                margin: const EdgeInsets.all(16),
+                                duration: const Duration(seconds: 3),
+                              ),
+                            );
+
+                            // Optional: Navigator.pop(context); // Go back to home
+                          },
                         ),
                       )
                     ],

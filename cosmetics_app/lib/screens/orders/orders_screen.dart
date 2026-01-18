@@ -16,7 +16,12 @@ class OrdersScreen extends StatelessWidget {
       return const Scaffold(body: Center(child: Text("Please Login")));
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Track My Orders"), centerTitle: true),
+      appBar: AppBar(
+      centerTitle: true,
+      title: const Text("Track My Orders", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,),
+      ),
+    ),
+
       body: StreamBuilder<List<OrderModel>>(
         stream: dbService.getUserOrders(user.uid),
         builder: (context, snapshot) {
@@ -24,17 +29,17 @@ class OrdersScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-  return Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Icon(Icons.local_shipping_outlined, size: 60, color: Colors.grey),
-        const SizedBox(height: 10),
-        const Text("You haven't placed any orders yet!"),
-      ],
-    ),
-  );
-}
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.local_shipping_outlined, size: 60, color: Colors.grey),
+                    const SizedBox(height: 10),
+                    const Text("You haven't placed any orders yet!"),
+                  ],
+                ),
+              );
+            }
 
           final orders = snapshot.data!;
 
