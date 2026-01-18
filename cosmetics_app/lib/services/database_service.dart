@@ -15,13 +15,16 @@ class DatabaseService {
     });
   }
 
-  // 2. HELPER: Add Sample Data (Expanded)
+  // 2. HELPER: Add Sample Data (With Safety Check)
   Future<void> addDummyData() async {
     final CollectionReference products = _db.collection('products');
-    
-    // Check if data exists first so we don't duplicate
-    // var snapshot = await products.limit(1).get();
-    // if (snapshot.docs.isNotEmpty) return;
+
+    // 🛑 SAFETY CHECK: Stop if data already exists to prevent duplicates
+    var snapshot = await products.limit(1).get();
+    if (snapshot.docs.isNotEmpty) {
+      print("✅ Database already has products. Skipping upload.");
+      return; 
+    }
 
     List<Map<String, dynamic>> dummyProducts = [
       // --- MAKEUP (6 Items) ---
@@ -92,7 +95,7 @@ class DatabaseService {
       },
       {
         "name": "Night Repair Cream",
-        "description": "Rich cream to rejuvenate skin while you sleep.",
+        "description": "Rich cream to skin while you sleep.",
         "price": 750.00,
         "category": "Skincare",
         "imageUrl": "https://heavenlyhome.in/wp-content/uploads/2023/09/NIGHT-REPAIR-CREAM.webp",
@@ -100,14 +103,14 @@ class DatabaseService {
 
       // --- PERFUME (2 Items) ---
       {
-        "name": "Floral Eau de Parfum",
+        "name": "Floral Perfume",
         "description": "A fresh blend of jasmine, rose, and citrus.",
         "price": 2500.00,
         "category": "Perfume",
         "imageUrl": "https://pics.walgreens.com/prodimg/658123/900.jpg",
       },
       {
-        "name": "Midnight Musk Cologne",
+        "name": "Midnight Cologne",
         "description": "Deep woody notes with a hint of vanilla.",
         "price": 3000.00,
         "category": "Perfume",
@@ -117,6 +120,7 @@ class DatabaseService {
 
     for (var p in dummyProducts) {
       await products.add(p);
+      print("  -> Added: ${p['name']}");
     }
   }
 
