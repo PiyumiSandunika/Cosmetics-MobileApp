@@ -65,25 +65,41 @@ class WishlistScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     child: Image.network(
                       product.imageUrl,
-                      width: 60,
-                      height: 60,
+                      width: 80,
+                      height: 100,
                       fit: BoxFit.cover,
                     ),
                   ),
                   title: Text(
                     product.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                   subtitle: Text(
                     "Rs.${product.price.toStringAsFixed(2)}",
-                    style: TextStyle(color: Theme.of(context).primaryColor),
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete_outline, color: Colors.red),
                     onPressed: () async {
                       await dbService.removeFromWishlist(user.uid, product.id);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Removed from wishlist")),
+                        SnackBar(
+                          content: const Text(
+                            "Removed from wishlist",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          backgroundColor: const Color.fromARGB(255, 109, 9, 42),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          margin: const EdgeInsets.all(16),
+                          duration: const Duration(seconds: 3),
+                        ),
                       );
                     },
                   ),
