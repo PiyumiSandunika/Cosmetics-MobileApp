@@ -73,16 +73,21 @@ class OrdersScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: order.status == 'Pending'
                                   ? Colors.amber.shade200
-                                  : Colors.blue.shade100,
+                                  : order.status == 'Shipped'
+                                      ? Colors.blue.shade200
+                                      : Colors.green.shade200, // Delivered
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
                               order.status,
                               style: TextStyle(
                                 color: order.status == 'Pending'
-                                    ? Colors.orange.shade800
-                                    : Colors.green.shade800,
+                                    ? const Color.fromARGB(255, 191, 45, 45)
+                                    : order.status == 'Shipped'
+                                        ? const Color.fromARGB(255, 9, 49, 95)
+                                        : const Color.fromARGB(255, 23, 107, 27), // Delivered
                                 fontWeight: FontWeight.bold,
+                                fontSize: 15
                               ),
                             ),
                           ),
@@ -96,7 +101,7 @@ class OrdersScreen extends StatelessWidget {
                             children: [
                               Text(
                                 "1x ",
-                                style: TextStyle(color: Colors.grey[600]),
+                                style: TextStyle(color: const Color.fromARGB(255, 139, 65, 117), fontSize: 17),
                               ),
                               Expanded(child: Text(item['name'])),
                               Text("Rs.${item['price']}"),
