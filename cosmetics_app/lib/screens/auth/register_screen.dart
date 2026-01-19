@@ -29,7 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // --- 🖼️ LOCAL LOGO START ---
+              // --- LOCAL LOGO START ---
               Container(
                 padding: const EdgeInsets.all(10),
                 child: Image.asset(
@@ -39,7 +39,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   fit: BoxFit.contain,
                 ),
               ),
-              // --- 🖼️ LOCAL LOGO END ---
+              // --- LOCAL LOGO END ---
 
               const SizedBox(height: 12),
               const Text(
@@ -136,7 +136,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           setState(() => isLoading = false);
 
                           if (user != null) {
-                            // --- ✅ YOUR UPDATED SNACKBAR CODE ---
+                            // --- YOUR UPDATED SNACKBAR CODE ---
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text( // Removed 'const' here to allow dynamic styling if needed, but 'const' is fine if style is static

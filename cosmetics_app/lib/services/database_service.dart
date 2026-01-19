@@ -19,10 +19,10 @@ class DatabaseService {
   Future<void> addDummyData() async {
     final CollectionReference products = _db.collection('products');
 
-    // 🛑 SAFETY CHECK: Stop if data already exists to prevent duplicates
+    // SAFETY CHECK: Stop if data already exists to prevent duplicates
     var snapshot = await products.limit(1).get();
     if (snapshot.docs.isNotEmpty) {
-      print("✅ Database already has products. Skipping upload.");
+      print("Database already has products. Skipping upload.");
       return; 
     }
 
